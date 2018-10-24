@@ -1,7 +1,6 @@
-cppsrc=$(wildcard src/*.cpp)
+cppsrc=$(wildcard src/*.cpp) \
+       $(wildcard test/src/*.cpp)
 obj=$(cppsrc:.cpp=.o)
-
-cpptestsrc=test/src/test_main.o		   |
 
 #The following is not needed:
 #----------------------------------
@@ -15,14 +14,12 @@ LDFLAGS=-lcppunit -lgcov
 
 all:m.out
 
-m.out:$(obj) $(cpptestsrc)
-	$(CXX) -o $@ $^ $(LDFLAGS)
-$(cpptestsrc):
+m.out:$(obj) $(objtest)
 	(cd test; make)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 .PHONY:clean
 clean:
 	#removed -r flag because we are considering specific files only and no directories
-	(cd test; make clean)
 	rm -v -f *.gcda *.xml *.o *.out src/*.gcda src/*.o src/*.gcno test/src/*.o test/src/*.gcno 
-	
+	(cd test; make clean)
