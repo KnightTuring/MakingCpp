@@ -1,0 +1,209 @@
+        -:    0:Source:/usr/local/include/cppunit/TestCaller.h
+        -:    0:Programs:2
+        -:    1:#ifndef CPPUNIT_TESTCALLER_H    // -*- C++ -*-
+        -:    2:#define CPPUNIT_TESTCALLER_H
+        -:    3:
+        -:    4:#include <cppunit/Exception.h>
+        -:    5:#include <cppunit/TestCase.h>
+        -:    6:
+        -:    7:#include <functional>
+        -:    8:
+        -:    9:
+        -:   10:#if defined(CPPUNIT_USE_TYPEINFO_NAME)
+        -:   11:#  include <cppunit/extensions/TypeInfoHelper.h>
+        -:   12:#endif
+        -:   13:
+        -:   14:
+        -:   15:CPPUNIT_NS_BEGIN
+        -:   16:
+        -:   17:#if 0
+        -:   18:/*! \brief Marker class indicating that no exception is expected by TestCaller.
+        -:   19: * This class is an implementation detail. You should never use this class directly.
+        -:   20: */
+        -:   21:class CPPUNIT_API NoExceptionExpected
+        -:   22:{
+        -:   23:private:
+        -:   24:  //! Prevent class instantiation.
+        -:   25:  NoExceptionExpected();
+        -:   26:};
+        -:   27:
+        -:   28:
+        -:   29:/*! \brief (Implementation) Traits used by TestCaller to expect an exception.
+        -:   30: *
+        -:   31: * This class is an implementation detail. You should never use this class directly.
+        -:   32: */
+        -:   33:template<class ExceptionType>
+        -:   34:struct ExpectedExceptionTraits
+        -:   35:{
+        -:   36:  static void expectedException()
+        -:   37:  {
+        -:   38:#if defined(CPPUNIT_USE_TYPEINFO_NAME)
+        -:   39:    throw Exception( Message(
+        -:   40:                         "expected exception not thrown",
+        -:   41:                         "Expected exception type: " + 
+        -:   42:                           TypeInfoHelper::getClassName( typeid( ExceptionType ) ) ) );
+        -:   43:#else
+        -:   44:    throw Exception( "expected exception not thrown" );
+        -:   45:#endif
+        -:   46:  }
+        -:   47:};
+        -:   48:
+        -:   49:
+        -:   50:/*! \brief (Implementation) Traits specialization used by TestCaller to 
+        -:   51: * expect no exception.
+        -:   52: *
+        -:   53: * This class is an implementation detail. You should never use this class directly.
+        -:   54: */
+        -:   55:template<>
+        -:   56:struct ExpectedExceptionTraits<NoExceptionExpected>
+        -:   57:{
+        -:   58:  static void expectedException()
+        -:   59:  {
+        -:   60:  }
+        -:   61:};
+        -:   62:
+        -:   63:
+        -:   64:#endif
+        -:   65:
+        -:   66://*** FIXME: rework this when class Fixture is implemented. ***//
+        -:   67:
+        -:   68:
+        -:   69:/*! \brief Generate a test case from a fixture method.
+        -:   70: * \ingroup WritingTestFixture
+        -:   71: *
+        -:   72: * A test caller provides access to a test case method 
+        -:   73: * on a test fixture class.  Test callers are useful when 
+        -:   74: * you want to run an individual test or add it to a 
+        -:   75: * suite.
+        -:   76: * Test Callers invoke only one Test (i.e. test method) on one 
+        -:   77: * Fixture of a TestFixture.
+        -:   78: * 
+        -:   79: * Here is an example:
+        -:   80: * \code
+        -:   81: * class MathTest : public CppUnit::TestFixture {
+        -:   82: *         ...
+        -:   83: *     public:
+        -:   84: *         void         setUp();
+        -:   85: *         void         tearDown();
+        -:   86: *
+        -:   87: *         void         testAdd();
+        -:   88: *         void         testSubtract();
+        -:   89: * };
+        -:   90: *
+        -:   91: * CppUnit::Test *MathTest::suite() {
+        -:   92: *     CppUnit::TestSuite *suite = new CppUnit::TestSuite;
+        -:   93: *
+        -:   94: *     suite->addTest( new CppUnit::TestCaller<MathTest>( "testAdd", testAdd ) );
+        -:   95: *     return suite;
+        -:   96: * }
+        -:   97: * \endcode
+        -:   98: *
+        -:   99: * You can use a TestCaller to bind any test method on a TestFixture
+        -:  100: * class, as long as it accepts void and returns void.
+        -:  101: * 
+        -:  102: * \see TestCase
+        -:  103: */
+        -:  104:
+        -:  105:template <class Fixture>
+        -:  106:class TestCaller : public TestCase
+        -:  107:{ 
+        -:  108:  typedef void (Fixture::*TestMethod)();
+        -:  109:    
+        -:  110:public:
+        -:  111:  /*!
+        -:  112:   * Constructor for TestCaller. This constructor builds a new Fixture
+        -:  113:   * instance owned by the TestCaller.
+        -:  114:   * \param name name of this TestCaller
+        -:  115:   * \param test the method this TestCaller calls in runTest()
+        -:  116:   */
+        -:  117:  TestCaller( std::string name, TestMethod test ) :
+        -:  118:	    TestCase( name ), 
+        -:  119:	    m_ownFixture( true ),
+        -:  120:	    m_fixture( new Fixture() ),
+        -:  121:	    m_test_function( std::bind(test, m_fixture) )
+        -:  122:  {
+        -:  123:  }
+        -:  124:
+        -:  125:  /*!
+        -:  126:   * Constructor for TestCaller. 
+        -:  127:   * This constructor does not create a new Fixture instance but accepts
+        -:  128:   * an existing one as parameter. The TestCaller will not own the
+        -:  129:   * Fixture object.
+        -:  130:   * \param name name of this TestCaller
+        -:  131:   * \param test the method this TestCaller calls in runTest()
+        -:  132:   * \param fixture the Fixture to invoke the test method on.
+        -:  133:   */
+        -:  134:  TestCaller(std::string name, TestMethod test, Fixture& fixture) :
+        -:  135:	    TestCase( name ), 
+        -:  136:	    m_ownFixture( false ),
+        -:  137:	    m_fixture( &fixture ),
+        -:  138:	    m_test_function( std::bind(test, &fixture) )
+        -:  139:  {
+        -:  140:  }
+        -:  141:    
+        -:  142:  /*!
+        -:  143:   * Constructor for TestCaller. 
+        -:  144:   * This constructor does not create a new Fixture instance but accepts
+        -:  145:   * an existing one as parameter. The TestCaller will own the
+        -:  146:   * Fixture object and delete it in its destructor.
+        -:  147:   * \param name name of this TestCaller
+        -:  148:   * \param test the method this TestCaller calls in runTest()
+        -:  149:   * \param fixture the Fixture to invoke the test method on.
+        -:  150:   */
+        1:  151:  TestCaller(std::string name, TestMethod test, Fixture* fixture) :
+        -:  152:	    TestCase( name ), 
+        -:  153:	    m_ownFixture( true ),
+        -:  154:	    m_fixture( fixture ),
+        1:  155:	    m_test_function( std::bind(test, fixture) )
+        -:  156:  {
+        1:  157:  }
+        -:  158:
+        -:  159:  TestCaller(std::string name, std::function<void()> test_function, Fixture* fixture):
+        -:  160:      TestCase(name),
+        -:  161:      m_ownFixture(true),
+        -:  162:      m_fixture(fixture),
+        -:  163:      m_test_function(test_function)
+        -:  164:    {
+        -:  165:    }
+        -:  166:    
+        2:  167:  ~TestCaller() 
+        -:  168:  {
+        1:  169:    if (m_ownFixture)
+        1:  170:      delete m_fixture;
+        3:  171:  }
+        -:  172:
+        1:  173:  void runTest()
+        -:  174:  { 
+        1:  175:      m_test_function();
+        1:  176:  }  
+        -:  177:
+        1:  178:  void setUp()
+        -:  179:  { 
+        1:  180:  	m_fixture->setUp (); 
+        1:  181:  }
+        -:  182:
+        1:  183:  void tearDown()
+        -:  184:  { 
+        1:  185:	  m_fixture->tearDown (); 
+        1:  186:  }
+        -:  187:
+        -:  188:  std::string toString() const
+        -:  189:  { 
+        -:  190:  	return "TestCaller " + getName(); 
+        -:  191:  }
+        -:  192:
+        -:  193:private: 
+        -:  194:  TestCaller( const TestCaller &other ); 
+        -:  195:  TestCaller &operator =( const TestCaller &other );
+        -:  196:
+        -:  197:private:
+        -:  198:  bool m_ownFixture;
+        -:  199:  Fixture *m_fixture;
+        -:  200:  std::function<void()> m_test_function;
+        -:  201:};
+        -:  202:
+        -:  203:
+        -:  204:
+        -:  205:CPPUNIT_NS_END
+        -:  206:
+        -:  207:#endif // CPPUNIT_TESTCALLER_H

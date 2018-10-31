@@ -1,3 +1,14 @@
+#=============================================================================
+#     FileName: Makefile
+#         Desc: 
+#       Author: Abdul Wasay
+#        Email: wasaya@acm.org
+#     HomePage: https://knightturing.github.io/
+#      Version: 1.0
+#   LastChange: 2018-10-30 14:33:57
+#      History:
+#=============================================================================
+
 #-----------------------------------------------
 # This is the top level Makefile, it will	|
 # make libraries of Complex which will be	| 
@@ -34,4 +45,6 @@ $(LIBNAME):$(obj)
 .PHONY:clean
 clean:
 	#removed -r flag because we are considering specific files only and no directories
-	rm -v -f *.gcda *.xml *.o *.out src/*.gcda src/*.o src/*.gcno test/src/*.o test/src/*.gcno\  lib/*.a *.gcno bin/*.out	
+	rm -v -f *.gcda *.xml *.o *.out src/*.gcda src/*.o src/*.gcno test/src/*.o test/src/*.gcno\  lib/*.a *.gcno bin/*.out ./src/*.info ./generator_script/*.xml ./generator_script/*.info
+	rm -r html_output
+	rm -r gcov_files

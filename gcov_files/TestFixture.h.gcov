@@ -1,0 +1,101 @@
+        -:    0:Source:/usr/local/include/cppunit/TestFixture.h
+        -:    0:Programs:2
+        -:    1:#ifndef CPPUNIT_TESTFIXTURE_H    // -*- C++ -*-
+        -:    2:#define CPPUNIT_TESTFIXTURE_H
+        -:    3:
+        -:    4:#include <cppunit/Portability.h>
+        -:    5:
+        -:    6:CPPUNIT_NS_BEGIN
+        -:    7:
+        -:    8:
+        -:    9:/*! \brief Wraps a test case with setUp and tearDown methods.
+        -:   10: * \ingroup WritingTestFixture
+        -:   11: *
+        -:   12: * A TestFixture is used to provide a common environment for a set
+        -:   13: * of test cases.
+        -:   14: *
+        -:   15: * To define a test fixture, do the following:
+        -:   16: * - implement a subclass of TestCase 
+        -:   17: * - the fixture is defined by instance variables 
+        -:   18: * - initialize the fixture state by overriding setUp
+        -:   19: *   (i.e. construct the instance variables of the fixture)
+        -:   20: * - clean-up after a test by overriding tearDown.
+        -:   21: *
+        -:   22: * Each test runs in its own fixture so there
+        -:   23: * can be no side effects among test runs.
+        -:   24: * Here is an example:
+        -:   25: * 
+        -:   26: * \code
+        -:   27: * class MathTest : public CppUnit::TestFixture {
+        -:   28: * protected:
+        -:   29: *   int m_value1, m_value2;
+        -:   30: *
+        -:   31: * public:
+        -:   32: *   MathTest() {}
+        -:   33: *
+        -:   34: *   void setUp () {
+        -:   35: *     m_value1 = 2;
+        -:   36: *     m_value2 = 3;
+        -:   37: *   }
+        -:   38: * }
+        -:   39: * \endcode
+        -:   40: *
+        -:   41: * For each test implement a method which interacts
+        -:   42: * with the fixture. Verify the expected results with assertions specified
+        -:   43: * by calling CPPUNIT_ASSERT on the expression you want to test:
+        -:   44: * 
+        -:   45: * \code
+        -:   46: * public: 
+        -:   47: *   void testAdd () {
+        -:   48: *     int result = m_value1 + m_value2;
+        -:   49: *     CPPUNIT_ASSERT( result == 5 );
+        -:   50: *   }
+        -:   51: * \endcode
+        -:   52: * 
+        -:   53: * Once the methods are defined you can run them. To do this, use
+        -:   54: * a TestCaller.
+        -:   55: *
+        -:   56: * \code
+        -:   57: * CppUnit::Test *test = new CppUnit::TestCaller<MathTest>( "testAdd", 
+        -:   58: *                                                          &MathTest::testAdd );
+        -:   59: * test->run();
+        -:   60: * \endcode
+        -:   61: *
+        -:   62: *
+        -:   63: * The tests to be run can be collected into a TestSuite. 
+        -:   64: * 
+        -:   65: * \code
+        -:   66: * public: 
+        -:   67: *   static CppUnit::TestSuite *MathTest::suite () {
+        -:   68: *      CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite;
+        -:   69: *      suiteOfTests->addTest(new CppUnit::TestCaller<MathTest>(
+        -:   70: *                              "testAdd", &MathTest::testAdd));
+        -:   71: *      suiteOfTests->addTest(new CppUnit::TestCaller<MathTest>(
+        -:   72: *                              "testDivideByZero", &MathTest::testDivideByZero));
+        -:   73: *      return suiteOfTests;
+        -:   74: *  }
+        -:   75: * \endcode
+        -:   76: * 
+        -:   77: * A set of macros have been created for convenience. They are located in HelperMacros.h.
+        -:   78: *
+        -:   79: * \see TestResult, TestSuite, TestCaller,
+        -:   80: * \see CPPUNIT_TEST_SUB_SUITE, CPPUNIT_TEST, CPPUNIT_TEST_SUITE_END, 
+        -:   81: * \see CPPUNIT_TEST_SUITE_REGISTRATION, CPPUNIT_TEST_EXCEPTION, CPPUNIT_TEST_FAIL.
+        -:   82: */
+        1:   83:class CPPUNIT_API TestFixture
+        -:   84:{
+        -:   85:public:
+        1:   86:  virtual ~TestFixture() {};
+        -:   87:
+        -:   88:  //! \brief Set up context before running a test.
+        1:   89:  virtual void setUp() {};
+        -:   90:
+        -:   91:  //! Clean up after the test run.
+        1:   92:  virtual void tearDown() {};
+        -:   93:};
+        -:   94:
+        -:   95:
+        -:   96:CPPUNIT_NS_END
+        -:   97:
+        -:   98:
+        -:   99:#endif

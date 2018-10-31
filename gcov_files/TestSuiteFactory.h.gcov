@@ -1,0 +1,29 @@
+        -:    0:Source:/usr/local/include/cppunit/extensions/TestSuiteFactory.h
+        -:    0:Programs:2
+        -:    1:#ifndef CPPUNIT_EXTENSIONS_TESTSUITEFACTORY_H
+        -:    2:#define CPPUNIT_EXTENSIONS_TESTSUITEFACTORY_H
+        -:    3:
+        -:    4:#include <cppunit/extensions/TestFactory.h>
+        -:    5:
+        -:    6:CPPUNIT_NS_BEGIN
+        -:    7:
+        -:    8:
+        -:    9:  class Test;
+        -:   10:
+        -:   11:  /*! \brief TestFactory for TestFixture that implements a static suite() method.
+        -:   12:   * \see AutoRegisterSuite.
+        -:   13:   */
+        -:   14:  template<class TestCaseType>
+        1:   15:  class TestSuiteFactory : public TestFactory
+        -:   16:  {
+        -:   17:  public:
+        1:   18:    virtual Test *makeTest()
+        -:   19:    {
+        1:   20:      return TestCaseType::suite();
+        -:   21:    }
+        -:   22:  };
+        -:   23:
+        -:   24:
+        -:   25:CPPUNIT_NS_END
+        -:   26:
+        -:   27:#endif  // CPPUNIT_EXTENSIONS_TESTSUITEFACTORY_H

@@ -1,3 +1,15 @@
+#=============================================================================
+#     FileName: Makefile
+#         Desc: 
+#       Author: Abdul Wasay
+#        Email: wasaya@acm.org
+#     HomePage: https://knightturing.github.io/
+#      Version: 1.0
+#   LastChange: 2018-10-30 14:38:10
+#      History:
+#=============================================================================
+
+
 #-------------------------------------------------------
 # This is the Makefile for the test directory,		|
 # it will build the binary. During the build 		|
@@ -39,4 +51,6 @@ $(obj):$(cppsrc)
 .PHONY:clean
 clean:
 	(cd ..; make clean)
-	rm -v -f ./bin/*.out ./bin/*.xml *.txt *.o *.gcda src/*.gcda src/*.o src/*.gcno *.gcno *.gcda
+	rm -v -f ./bin/*.out ./bin/*.xml *.txt *.o *.gcda src/*.gcda src/*.o src/*.gcno *.gcno *.gcda *.gcov ./src/*.gcov *.xml ./src/*.info
+	
+

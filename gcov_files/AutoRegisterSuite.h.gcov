@@ -1,0 +1,85 @@
+        -:    0:Source:/usr/local/include/cppunit/extensions/AutoRegisterSuite.h
+        -:    0:Programs:2
+        -:    1:#ifndef CPPUNIT_EXTENSIONS_AUTOREGISTERSUITE_H
+        -:    2:#define CPPUNIT_EXTENSIONS_AUTOREGISTERSUITE_H
+        -:    3:
+        -:    4:#include <cppunit/extensions/TestSuiteFactory.h>
+        -:    5:#include <cppunit/extensions/TestFactoryRegistry.h>
+        -:    6:#include <string>
+        -:    7:
+        -:    8:CPPUNIT_NS_BEGIN
+        -:    9:
+        -:   10:
+        -:   11:/*! \brief (Implementation) Automatically register the test suite of the specified type.
+        -:   12: *
+        -:   13: * You should not use this class directly. Instead, use the following macros:
+        -:   14: * - CPPUNIT_TEST_SUITE_REGISTRATION()
+        -:   15: * - CPPUNIT_TEST_SUITE_NAMED_REGISTRATION()
+        -:   16: *
+        -:   17: * This object will register the test returned by TestCaseType::suite()
+        -:   18: * when constructed to the test registry.
+        -:   19: *
+        -:   20: * This object is intented to be used as a static variable.
+        -:   21: *
+        -:   22: *
+        -:   23: * \param TestCaseType Type of the test case which suite is registered.
+        -:   24: * \see CPPUNIT_TEST_SUITE_REGISTRATION, CPPUNIT_TEST_SUITE_NAMED_REGISTRATION
+        -:   25: * \see CppUnit::TestFactoryRegistry.
+        -:   26: */
+        -:   27:template<class TestCaseType>
+        -:   28:class AutoRegisterSuite
+        -:   29:{
+        -:   30:public:
+        -:   31:  /** Auto-register the suite factory in the global registry.
+        -:   32:   */
+        1:   33:  AutoRegisterSuite()
+        1:   34:      : m_registry( &TestFactoryRegistry::getRegistry() )
+        -:   35:  {
+        1:   36:    m_registry->registerFactory( &m_factory );
+        1:   37:  }
+        -:   38:
+        -:   39:  /** Auto-register the suite factory in the specified registry.
+        -:   40:   * \param name Name of the registry.
+        -:   41:   */
+        -:   42:  AutoRegisterSuite( const std::string &name )
+        -:   43:      : m_registry( &TestFactoryRegistry::getRegistry( name ) )
+        -:   44:  {
+        -:   45:    m_registry->registerFactory( &m_factory );
+        -:   46:  }
+        -:   47:
+    #####:   48:  ~AutoRegisterSuite()
+        -:   49:  {
+    #####:   50:    if ( TestFactoryRegistry::isValid() )
+    #####:   51:      m_registry->unregisterFactory( &m_factory );
+    #####:   52:  }
+        -:   53:
+        -:   54:private:
+        -:   55:  TestFactoryRegistry *m_registry;
+        -:   56:  TestSuiteFactory<TestCaseType> m_factory;
+        -:   57:};
+        -:   58:
+        -:   59:
+        -:   60:/*! \brief (Implementation) Automatically adds a registry into another registry.
+        -:   61: *
+        -:   62: * Don't use this class. Use the macros CPPUNIT_REGISTRY_ADD() and
+        -:   63: * CPPUNIT_REGISTRY_ADD_TO_DEFAULT() instead.
+        -:   64: */
+        -:   65:class AutoRegisterRegistry
+        -:   66:{
+        -:   67:public:
+        -:   68:  AutoRegisterRegistry( const std::string &which,
+        -:   69:                        const std::string &to )
+        -:   70:  {
+        -:   71:    TestFactoryRegistry::getRegistry( to ).addRegistry( which );
+        -:   72:  }
+        -:   73:
+        -:   74:  AutoRegisterRegistry( const std::string &which )
+        -:   75:  {
+        -:   76:    TestFactoryRegistry::getRegistry().addRegistry( which );
+        -:   77:  }
+        -:   78:};
+        -:   79:
+        -:   80:
+        -:   81:CPPUNIT_NS_END
+        -:   82:
+        -:   83:#endif  // CPPUNIT_EXTENSIONS_AUTOREGISTERSUITE_H

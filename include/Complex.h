@@ -1,3 +1,14 @@
+/*=============================================================================
+#     FileName: Complex.h
+#         Desc: Header for libcomplex library
+#       Author: Abdul Wasay
+#        Email: wasaya@acm.org
+#     HomePage: https://knightturing.github.io/
+#      Version: 1.0
+#   LastChange: 2018-10-30 14:39:43
+#      History:
+=============================================================================*/
+
 #ifndef COMPLEX_H
 #define COMPLEX_H
 
